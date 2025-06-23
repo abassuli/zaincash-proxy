@@ -2,7 +2,7 @@ const https = require("https");
 const querystring = require("querystring");
 
 exports.handler = async function(event, context) {
-  const token = "<ضع_هنا_التوكن>";  // ← نبدله لاحقاً
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhbW91bnQiOjIwMDAsInNlcnZpY2VUeXBlIjoiQXBwIFN1YnNjcmlwdGlvbiIsIm1zaXNkbiI6Ijk2NDc4MzUwNzc4OTMiLCJvcmRlcklkIjoiOTY0NzcwMDUzMzQwNS1vcmRlcjAwMSIsInJlZGlyZWN0VXJsIjoiaHR0cHM6Ly9lb2tvbTYyc29rdTFpazYubS5waXBlZHJlYW0ubmV0IiwiaWF0IjoxNzE5MTU5MDAwLCJleHAiOjE3MTkxNzM0MDB9.uYut0Ofu7w1VZFt2LtR59KvgyUJkX1zVld5A82h1_qI";
   const merchantId = "5ffacf6612b5777c6d44266f";
 
   const postData = querystring.stringify({
