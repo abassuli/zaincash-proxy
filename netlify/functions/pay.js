@@ -32,14 +32,29 @@ exports.handler = async function(event, context) {
       res.on("end", () => {
         try {
           const json = JSON.parse(body);
-          resolve({
-            statusCode: 200,
-            body: JSON.stringify({
-              transaction_url: `https://test.zaincash.iq/transaction/pay?id=${json.id}`
-            })
-          });
+          console.log("ZainCash response:", json);  // <-- نطبع الرد هنا
+
+          if (json.id) {
+            resolve({
+              statusCode: 200,
+              body: JSON.stringify({
+                transaction_url: `https://test.zaincash.iq/transaction/pay?id=${json.id}`
+              })
+            });
+          } else {
+            resolve({
+              statusCode: 500,
+              body: JSON.stringify({
+                error: "No id returned from ZainCash",
+                rawResponse: json
+              })
+            });
+          }
         } catch (err) {
-          resolve({ statusCode: 500, body: "Failed to parse response" });
+          resolve({
+            statusCode: 500,
+            body: JSON.stringify({ error: "Failed to parse response", details: err.message, rawBody: body })
+          });
         }
       });
     });
