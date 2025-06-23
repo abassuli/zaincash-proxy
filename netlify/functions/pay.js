@@ -1,10 +1,32 @@
 const https = require("https");
 const querystring = require("querystring");
+const jwt = require("jsonwebtoken"); // تأكد تكون مثبتة
 
 exports.handler = async function(event, context) {
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhbW91bnQiOjIwMDAsInNlcnZpY2VUeXBlIjoiQXBwIFN1YnNjcmlwdGlvbiIsIm1zaXNkbiI6Ijk2NDc4MzUwNzc4OTMiLCJvcmRlcklkIjoiOTY0NzcwMDUzMzQwNS1vcmRlcjAwMSIsInJlZGlyZWN0VXJsIjoiaHR0cHM6Ly9lb2tvbTYyc29rdTFpazYubS5waXBlZHJlYW0ubmV0IiwiaWF0IjoxNzE5MTU5MDAwLCJleHAiOjE3MTkxNzM0MDB9.uYut0Ofu7w1VZFt2LtR59KvgyUJkX1zVld5A82h1_qI";
+  // ✅ بيانات التاجر التجريبية من الوثائق
   const merchantId = "5ffacf6612b5777c6d44266f";
+  const msisdn = "9647835077893"; // رقم محفظة التاجر (وليس الزبون)
+  const secret = "$2y$10$hBbAZo2GfSSvyqAyV2SaqOfYewgYpfR1O19gIh4SqyGWdmySZYPuS";
 
+  // ⏱ الوقت الحالي والانتهاء بعد 4 ساعات
+  const iat = Math.floor(Date.now() / 1000);
+  const exp = iat + 4 * 60 * 60;
+
+  // 🧾 بيانات العملية
+  const payload = {
+    amount: 2000, // لازم أكثر من 250
+    serviceType: "Test Payment",
+    msisdn: msisdn,
+    orderId: "order_" + Date.now(),
+    redirectUrl: "https://eokom62soku1ik6.m.pipedream.net", // غيّره لاحقًا إذا تريد
+    iat: iat,
+    exp: exp
+  };
+
+  // 🔐 توليد التوكن
+  const token = jwt.sign(payload, secret, { algorithm: "HS256" });
+
+  // 📦 تجهيز البيانات للإرسال
   const postData = querystring.stringify({
     token,
     merchantId,
@@ -21,6 +43,7 @@ exports.handler = async function(event, context) {
     }
   };
 
+  // 🔁 تنفيذ الطلب
   return new Promise((resolve, reject) => {
     const req = https.request(options, res => {
       let body = "";
@@ -32,7 +55,7 @@ exports.handler = async function(event, context) {
       res.on("end", () => {
         try {
           const json = JSON.parse(body);
-          console.log("ZainCash response:", json);  // <-- نطبع الرد هنا
+          console.log("ZainCash response:", json);
 
           if (json.id) {
             resolve({
